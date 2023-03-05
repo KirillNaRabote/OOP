@@ -3,7 +3,7 @@
 std::string ReplaceString(const std::string& subject,
 	const std::string& searchString, const std::string& replacementString)
 {
-	if (searchString == "")
+	if (searchString == "" || searchString == replacementString)
 	{
 		return subject;
 	}
@@ -35,7 +35,7 @@ void CopyStreamWithReplacement(std::istream& input, std::ostream& output,
 
 	while (std::getline(input, line))
 	{
-		output << ReplaceString(line, searchString, replacementString) << "\n";
+		output << ReplaceString(line, searchString, replacementString) << std::endl;
 	}
 }
 

@@ -14,11 +14,11 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="test-data">
-      <UniqueIdentifier>{d25a720e-25a6-44c6-9e40-45d30fe32d67}</UniqueIdentifier>
+      <UniqueIdentifier>{7593447d-d8c4-476e-931d-cc1cd0f81964}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="replace.cpp">
+    <ClCompile Include="radix.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -31,34 +31,24 @@
     <None Include="test.bat">
       <Filter>Исходные файлы</Filter>
     </None>
-    <None Include=".clang-format" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="fox.txt">
+    <Text Include="incorrect-number-system.txt">
       <Filter>test-data</Filter>
     </Text>
-    <Text Include="fox-replace-dog-with-cat.txt">
+    <Text Include="10-10-10.txt">
       <Filter>test-data</Filter>
     </Text>
-    <Text Include="ma.txt">
+    <Text Include="36-2-ZZZ.txt">
       <Filter>test-data</Filter>
     </Text>
-    <Text Include="ma-replace-ma-with-mama.txt">
+    <Text Include="incorrect-char.txt">
       <Filter>test-data</Filter>
     </Text>
-    <Text Include="empty.txt">
+    <Text Include="digit-of-another-number-system.txt">
       <Filter>test-data</Filter>
     </Text>
-    <Text Include="empty-replace-nothing-with-nothing.txt">
-      <Filter>test-data</Filter>
-    </Text>
-    <Text Include="empty-replace-adr-with-123.txt">
-      <Filter>test-data</Filter>
-    </Text>
-    <Text Include="numbers.txt">
-      <Filter>test-data</Filter>
-    </Text>
-    <Text Include="numbers-replace-1231234-with-zamena.txt">
+    <Text Include="overflow.txt">
       <Filter>test-data</Filter>
     </Text>
   </ItemGroup>

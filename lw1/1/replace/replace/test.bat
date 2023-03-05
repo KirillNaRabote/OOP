@@ -20,6 +20,9 @@ fc.exe %OUT% empty-replace-nothing-with-nothing.txt || goto err
 %PROGRAM% empty.txt %OUT% adr 123 || goto err
 fc.exe %OUT% empty-replace-adr-with-123.txt || goto err
 
+%PROGRAM% numbers.txt %OUT% 1231234 zamena || goto err
+fc.exe %OUT% numbers-replace-1231234-with-zamena.txt || goto err
+
 echo OK
 exit 0
 
