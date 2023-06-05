@@ -24,6 +24,10 @@ echo test 4 passed
 fc %OUT% testMatrixOut5.txt || goto err
 echo test 5 passed
 
+%PROGRAM% testMatrix6.txt > %OUT% || goto err
+fc %OUT% testMatrixOut6.txt || goto err
+echo test 6 passed
+
 echo OK
 exit 0
 

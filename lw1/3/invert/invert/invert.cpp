@@ -1,66 +1,75 @@
 ﻿#include "stdafx.h"
 
-const int MATRIX_COLUMNS = 3;
-const int MATRIX_LINES = 3;
+const int MATRIX_SIZE = 3;
 
-std::vector<std::vector<float>> InitMatrix(std::ifstream& matrixFile)
+using Matrix = std::vector<std::vector<double>>;
+
+Matrix InitMatrix(std::ifstream& matrixFile, bool& wasError)
 {
-	std::vector<std::vector<float>> matrix;
-	std::vector<float> matrixLine;
-	float coefficientValue;
+	wasError = false;
+	Matrix matrix;
+	std::vector<double> matrixLine;
+	double coefficientValue = 0;
+	int coefficientCount = 0;
 
 	while (matrixFile >> coefficientValue)
 	{
 		matrixLine.push_back(coefficientValue);
+		coefficientCount++;
 
-		if (matrixLine.size() == MATRIX_COLUMNS)
+		if (matrixLine.size() == MATRIX_SIZE)
 		{
 			matrix.push_back(matrixLine);
 			matrixLine.clear();
 		}
 	}
 
+	if (coefficientCount > MATRIX_SIZE * MATRIX_SIZE || coefficientCount < MATRIX_SIZE * MATRIX_SIZE)
+	{
+		wasError = true;
+	}
+
 	return matrix;
 }
 
-float FindMinor(std::vector<std::vector<float>> matrix, const int& lineNumber, const int& columnNumber)
+double FindMinor(Matrix matrix, const int& lineNumber, const int& columnNumber)
 {
-	std::vector<std::vector<float>> minorVector;
-	std::vector<float> minorVectorLine;
+	Matrix minor;
+	std::vector<double> minorLine;
 
-	for (int lineCount = 0; lineCount < MATRIX_LINES; lineCount++)
+	for (int lineCount = 0; lineCount < MATRIX_SIZE; lineCount++)
 	{
-		for (int columnCount = 0; columnCount < MATRIX_COLUMNS; columnCount++)
+		for (int columnCount = 0; columnCount < MATRIX_SIZE; columnCount++)
 		{
 			if (lineCount != lineNumber && columnCount != columnNumber)
 			{
-				minorVectorLine.push_back(matrix[lineCount][columnCount]);
+				minorLine.push_back(matrix[lineCount][columnCount]);
 			}
-			if (minorVectorLine.size() == 2)
+			if (minorLine.size() == 2)
 			{
-				minorVector.push_back(minorVectorLine);
-				minorVectorLine.clear();
+				minor.push_back(minorLine);
+				minorLine.clear();
 			}
 		}
 	}
 
-	return minorVector[0][0] * minorVector[1][1] - minorVector[0][1] * minorVector[1][0];
+	return minor[0][0] * minor[1][1] - minor[0][1] * minor[1][0];
 }
 
-float FindDeterminant(std::vector<std::vector<float>> matrix)
+double FindDeterminant(Matrix matrix)
 {
 	return matrix[0][0] * FindMinor(matrix, 0, 0) -
 		matrix[0][1] * FindMinor(matrix, 0, 1) + matrix[0][2] * FindMinor(matrix, 0, 2);
 }
 
-float FindAlgebraicComplement(std::vector<std::vector<float>> matrix, const int& lineNumber, const int& columnNumber)
+double FindAlgebraicComplement(Matrix matrix, const int& lineNumber, const int& columnNumber)
 {
 	return pow(-1, lineNumber + columnNumber + 2) * FindMinor(matrix, lineNumber, columnNumber);
 }
 
-std::vector<std::vector<float>> FindInverseMatrix(std::vector<std::vector<float>> matrix, bool& zeroDeterminant)
+std::vector<std::vector<double>> FindInverseMatrix(Matrix matrix, bool& zeroDeterminant)
 {
-	float determinant = FindDeterminant(matrix);
+	double determinant = FindDeterminant(matrix);
 
 	if (determinant == 0)
 	{
@@ -68,12 +77,12 @@ std::vector<std::vector<float>> FindInverseMatrix(std::vector<std::vector<float>
 		return matrix;
 	}
 
-	std::vector<std::vector<float>> inverseMatrix;
-	std::vector<float> inverseMatrixLine;
+	Matrix inverseMatrix;
+	std::vector<double> inverseMatrixLine;
 
-	for (int lineCount = 0; lineCount < MATRIX_LINES; lineCount++)
+	for (int lineCount = 0; lineCount < MATRIX_SIZE; lineCount++)
 	{
-		for (int columnCount = 0; columnCount < MATRIX_COLUMNS; columnCount++)
+		for (int columnCount = 0; columnCount < MATRIX_SIZE; columnCount++)
 		{
 			inverseMatrixLine.push_back(
 				FindAlgebraicComplement(matrix, columnCount, lineCount) / determinant
@@ -86,22 +95,22 @@ std::vector<std::vector<float>> FindInverseMatrix(std::vector<std::vector<float>
 	return inverseMatrix;
 }
 
-void PrintMatrix(std::vector<std::vector<float>> matrix)
+void PrintMatrix(Matrix matrix, std::ostream& output)
 {
-	for (int lineCount = 0; lineCount < MATRIX_LINES; lineCount++)
+	for (int lineCount = 0; lineCount < MATRIX_SIZE; lineCount++)
 	{
-		for (int columnCount = 0; columnCount < MATRIX_COLUMNS; columnCount++)
+		for (int columnCount = 0; columnCount < MATRIX_SIZE; columnCount++)
 		{
 			if (matrix[lineCount][columnCount] == 0)
 			{
-				std::cout << 0 << " ";
+				output << 0 << " ";
 			}
 			else
 			{
-				std::cout << std::fixed << std::setprecision(3) << matrix[lineCount][columnCount] << " ";
+				output << std::fixed << std::setprecision(3) << matrix[lineCount][columnCount] << " ";
 			}
 		}
-		std::cout << std::endl;
+		output << std::endl;
 	}
 }
 
@@ -114,13 +123,19 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	std::vector<std::vector<float>> matrix;
+	Matrix matrix;
 	std::ifstream matrixFile(argv[1]);
+	bool wasError = false;
 
-	matrix = InitMatrix(matrixFile);
+	matrix = InitMatrix(matrixFile, wasError);
+	if (wasError)
+	{
+		std::cout << "The matrix should be 3x3 in size" << std::endl;
+		return 0;
+	}
 
 	bool zeroDeterminant = false;
-	std::vector<std::vector<float>> inverseMatrix = FindInverseMatrix(matrix, zeroDeterminant);
+	Matrix inverseMatrix = FindInverseMatrix(matrix, zeroDeterminant);
 
 	if (zeroDeterminant)
 	{
@@ -128,7 +143,7 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		PrintMatrix(inverseMatrix);
+		PrintMatrix(inverseMatrix, std::cout);
 	}
 
 	return 0;

@@ -63,5 +63,11 @@
     <Text Include="testMatrixOut5.txt">
       <Filter>test-data</Filter>
     </Text>
+    <Text Include="testMatrix6.txt">
+      <Filter>test-data</Filter>
+    </Text>
+    <Text Include="testMatrixOut6.txt">
+      <Filter>test-data</Filter>
+    </Text>
   </ItemGroup>
 </Project>

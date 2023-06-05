@@ -3,8 +3,16 @@
 const std::string BASE_SYMBOLS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const int BASE_OF_DECIMAL_SYSTEM = 10;
 
-void CheckOverflow(const int& result, const int& radix, const int& degree, const int& digit, bool& wasError)
+void PrintMessage(const std::string mess)
 {
+	std::cout << mess << std::endl;
+}
+
+//Сложно и непонятно. С отрицательным числом не сработало
+bool CheckOverflow(int result, int radix, int degree, int digit)
+{
+	bool wasError = false;
+	//не использовать возведение в степень
 	if (radix > pow(INT_MAX, (1.0 / degree)))
 	{
 		wasError = true;
@@ -20,58 +28,49 @@ void CheckOverflow(const int& result, const int& radix, const int& degree, const
 
 	if (wasError)
 	{
-		std::cout << "Overflow" << std::endl;
+		PrintMessage("Overflow");
 	}
+
+	return wasError;
 }
 
-void CheckComplianceWithNumberSystem(const int& digit, const int& radix, bool& wasError)
+bool CheckComplianceWithNumberSystem(int digit, int radix)
 {
 	if (digit >= radix)
 	{
-		std::cout << "The number should not consist of digits that do not belong to "
-			<< "its number system" << std::endl;
-		wasError = true;
+		PrintMessage("The number should not consist of digits that do not belong to its number system");
+		return false;
 	}
-}
 
-void checkCorrectChar(const int& digit, bool& wasError)
+	return true;
+}
+//Не используется выходное значение, но используется входной параметр. Странное решение. Название функции не по стилю
+//Функция не делает, что обещает, либо делает, но очень странно. Зачем на нужна?
+//Зачем функция выводит что-то?
+bool CheckCorrectChar(int digit)
 {
 	if (digit == BASE_SYMBOLS.npos)
 	{
-		std::cout << "Incorrect input char" << std::endl;
-		wasError = true;
+		PrintMessage("Incorrect input char");
+		return false;
 	}
+
+	return true;
 }
-
-int StringToInt(const std::string& str, const int& radix, bool& wasError)
+int StringToInt(const std::string& str, int radix, bool& wasError)
 {
+	wasError = false;
 	int result = 0;
-	int degree = 0;
-
-	for (int counter = str.length() - 1; counter >= 0; counter--)
+	for (int counter = str.length() - 1, degree = 0; counter >= 0; counter--, degree++)
 	{
-		int digit = (int)BASE_SYMBOLS.find(str[counter]);
+		int digit = static_cast<int>(BASE_SYMBOLS.find(str[counter]));
 
-		checkCorrectChar(digit, wasError);
-		if (wasError)
+		if (wasError = !CheckCorrectChar(digit) || !CheckComplianceWithNumberSystem(digit, radix) || CheckOverflow(result, radix, degree, digit))
 		{
 			return result;
 		}
 
-		CheckComplianceWithNumberSystem(digit, radix, wasError);
-		if (wasError)
-		{
-			return result;
-		}
-
-		CheckOverflow(result, radix, degree, digit, wasError);
-		if (wasError)
-		{
-			return result;
-		}
-
-		result += (int)(digit * pow(radix, degree));
-		degree++;
+		result += static_cast<int>(digit * pow(radix, degree));
 	}
 
 	return result;
@@ -95,12 +94,13 @@ std::string IntToString(int n, int radix)
 std::string ConvertNumber(const std::string& sourceNotation, const std::string& destinationNotation,
 	const std::string& value, bool& wasError)
 {
+	wasError = false;
 	int source = StringToInt(sourceNotation, BASE_OF_DECIMAL_SYSTEM, wasError);
 	int destination = StringToInt(destinationNotation, BASE_OF_DECIMAL_SYSTEM, wasError);
 
 	if (source > 36 || destination > 36 || source < 2 || destination < 2)
 	{
-		std::cout << "The number system must belong to [2; 36]" << std::endl;
+		PrintMessage("The number system must belong to [2; 36]");
 		wasError = true;
 		return value;
 	}
@@ -144,3 +144,4 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
+//не работает с самым маленьким числом INT_MIN
